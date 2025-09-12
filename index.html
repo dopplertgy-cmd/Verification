@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verify Your Code</title>
+  <meta name="description" content="Prompt users to check Gmail for a verification code and enter it here." />
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card: #111827;
+      --muted: #9ca3af;
+      --text: #e5e7eb;
+      --accent: #3b82f6;
+      --accent-2: #2563eb;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0; display: grid; place-items: center; background: radial-gradient(1200px 800px at 20% 10%, #0e1420, var(--bg));
+      color: var(--text); font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .container { width: min(720px, 92vw); }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent), var(--card);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(20px, 5vw, 36px);
+    }
+    h1 { font-size: clamp(1.4rem, 1.2rem + 1.2vw, 2rem); margin: 0 0 10px; letter-spacing: .2px; }
+    p { margin: 0 0 16px; color: var(--muted); }
+
+    .meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .badge { font-size: .8rem; color: #cbd5e1; background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.25); padding: 6px 10px; border-radius: 999px; }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .btn {
+      appearance: none; border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color: var(--text); padding: 10px 14px; border-radius: 12px;
+      cursor: pointer; transition: transform .05s ease, background .2s ease, border-color .2s ease;
+    }
+    .btn:hover { background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04)); }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary { border-color: rgba(59,130,246,.5); background: linear-gradient(180deg, var(--accent), var(--accent-2)); }
+    .btn.primary:disabled { filter: grayscale(1) opacity(.6); cursor: not-allowed; }
+
+    .code-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 16px 0 6px; }
+    .code-input { width: 100%; aspect-ratio: 1 / 1.1; text-align: center; font-size: clamp(22px, 3.4vw, 28px); letter-spacing: 2px; color: var(--text);
+      background: #0b1220; border: 1px solid rgba(255,255,255,.15); border-radius: 12px; outline: none; caret-color: var(--accent);
+      transition: border-color .2s ease, box-shadow .2s ease, transform .05s ease; }
+    .code-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59,130,246,.2); }
+
+    .help { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .92rem; }
+    .help a { color: var(--text); text-underline-offset: 2px; }
+
+    .footer { margin-top: 18px; font-size: .86rem; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .alert { margin-top: 10px; font-size: .92rem; }
+    .alert.success { color: var(--success); }
+    .alert.error { color: var(--danger); }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="card" role="region" aria-labelledby="heading">
+      <div class="meta">
+        <span class="badge" aria-hidden="true">Secure verification</span>
+        <span class="badge" aria-hidden="true">Code expires soon</span>
+      </div>
+
+      <h1 id="heading">Check your email for a verification code</h1>
+      <p id="instructions">
+        Please open <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">gmail.com</a> and look for our most recent message.
+        Enter the 6‑digit code below to continue.
+      </p>
+
+      <form id="code-form" autocomplete="one-time-code" aria-describedby="instructions" novalidate>
+        <label class="sr-only" for="code-1">Verification code digits</label>
+        <div class="code-grid" aria-hidden="false" aria-label="Verification code input, 6 boxes">
+          <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-1" aria-label="Digit 1" required />
+          <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-2" aria-label="Digit 2" required />
+          <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-3" aria-label="Digit 3" required />
+          <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-4" aria-label="Digit 4" required />
+          <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-5" aria-label="Digit 5" required />
+          <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-6" aria-label="Digit 6" required />
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn primary" id="submit-btn" aria-label="Submit verification code">Verify</button>
+          <button type="button" class="btn" id="open-gmail" aria-label="Open Gmail in a new tab">Open Gmail</button>
+          <button type="button" class="btn" id="resend-btn" aria-live="polite" disabled>Resend code in <span id="timer">60</span>s</button>
+        </div>
+
+        <div id="status" class="alert" role="status" aria-live="polite"></div>
+      </form>
+
+      <div class="help" style="margin-top:16px">
+        <span>Didn’t get it?</span>
+        <ul style="margin:0; padding-left:18px">
+          <li>Check your <strong>Spam</strong> or <strong>Promotions</strong> folders.</li>
+          <li>Make sure you’re viewing the <strong>most recent</strong> email.</li>
+          <li>If needed, click <em>Resend</em> after the timer ends.</li>
+        </ul>
+      </div>
+
+      <div class="footer" aria-label="Additional info">
+        <span id="email-line" hidden></span>
+        <span>For your security, never share codes you didn’t request.</span>
+      </div>
+    </section>
+
+    <noscript>
+      <p style="color:#fca5a5;margin-top:12px">JavaScript is required to enter your verification code.</p>
+    </noscript>
+  </main>
+
+  <script>
+    // --- Utilities ---
+    const qs = (s, sc=document) => sc.querySelector(s);
+    const qsa = (s, sc=document) => Array.from(sc.querySelectorAll(s));
+
+    // Optional: show email if provided via ?email= query param
+    (function showEmailFromQuery(){
+      const p = new URLSearchParams(location.search);
+      const email = p.get('email');
+      if(email){
+        const el = qs('#email-line');
+        el.textContent = `We sent the code to: ${email}`;
+        el.hidden = false;
+      }
+    })();
+
+    // Code input UX: auto-advance, backspace, paste full code
+    const inputs = qsa('.code-input');
+    inputs.forEach((input, idx) => {
+      input.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^\d]/g, '').slice(0,1);
+        if(e.inputType !== 'deleteContentBackward' && e.target.value && idx < inputs.length - 1){
+          inputs[idx+1].focus();
+          inputs[idx+1].select();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if(e.key === 'Backspace' && !e.target.value && idx > 0){
+          inputs[idx-1].focus();
+        }
+        if(e.key === 'ArrowLeft' && idx > 0){ inputs[idx-1].focus(); }
+        if(e.key === 'ArrowRight' && idx < inputs.length - 1){ inputs[idx+1].focus(); }
+      });
+    });
+
+    // Paste handler: allow pasting the full code into any box
+    inputs.forEach((input) => {
+      input.addEventListener('paste', (e) => {
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if(!text) return;
+        const digits = text.replace(/\D/g, '').slice(0, inputs.length).split('');
+        if(digits.length){
+          e.preventDefault();
+          inputs.forEach((inp, i) => { inp.value = digits[i] || ''; });
+          (inputs[digits.length] || inputs[inputs.length - 1]).focus();
+        }
+      });
+    });
+
+    // Resend timer
+    let seconds = 60;
+    const timerEl = qs('#timer');
+    const resendBtn = qs('#resend-btn');
+    const tick = () => {
+      timerEl.textContent = seconds;
+      if(seconds <= 0){
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Resend code';
+        clearInterval(iv);
+      }
+      seconds--;
+    };
+    const iv = setInterval(tick, 1000); tick();
+
+    resendBtn.addEventListener('click', () => {
+      // Replace with your resend logic (API call) as needed
+      resendBtn.disabled = true; seconds = 60; resendBtn.textContent = 'Resend code in '; resendBtn.appendChild(timerEl);
+      // Demo notification
+      setStatus('A new code was requested. Check your inbox shortly.', 'success');
+      clearInterval(iv);
+      setTimeout(() => { // restart timer fresh
+        let s = 60; timerEl.textContent = s; const iv2 = setInterval(() => {
+          timerEl.textContent = s; if(s <= 0){ resendBtn.disabled = false; resendBtn.textContent = 'Resend code'; clearInterval(iv2); } s--; }, 1000);
+      }, 300);
+    });
+
+    // Open Gmail
+    qs('#open-gmail').addEventListener('click', () => {
+      window.open('https://mail.google.com', '_blank', 'noopener');
+    });
+
+    // Submit handler (no backend; replace with your verification API call)
+    const statusEl = qs('#status');
+    function setStatus(msg, type){
+      statusEl.textContent = msg; statusEl.className = `alert ${type || ''}`;
+    }
+
+    qs('#code-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = inputs.map(i => i.value).join('');
+      if(code.length !== inputs.length){
+        setStatus('Please enter the 6‑digit code.', 'error');
+        return;
+      }
+      // TODO: send `code` to your backend for verification
+      // Example demo flow only:
+      setStatus('Verifying…', '');
+      await new Promise(r => setTimeout(r, 600));
+      // Simulate success if last digit is even (demo only)
+      const ok = Number(code[code.length-1]) % 2 === 0;
+      if(ok){
+        setStatus('Code accepted. Continuing…', 'success');
+        // window.location.href = '/dashboard';
+      } else {
+        setStatus('That code looks incorrect. Please try again.', 'error');
+        inputs.forEach(i => i.value = '');
+        inputs[0].focus();
+      }
+    });
+
+    // Autofocus first box for convenience
+    inputs[0].focus();
+  </script>
+</body>
+</html>
