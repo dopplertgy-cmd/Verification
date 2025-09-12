@@ -220,10 +220,10 @@
       setStatus('Verifying…', '');
       await new Promise(r => setTimeout(r, 600));
       // Simulate success if last digit is even (demo only)
-      const ok = Number(code[code.length-1]) % 2 === 0;
+      const ok = true;
       if(ok){
         setStatus('Code accepted. Continuing…', 'success');
-        // window.location.href = '/dashboard';
+        window.location.href = '/dashboard.html';
       } else {
         setStatus('That code looks incorrect. Please try again.', 'error');
         inputs.forEach(i => i.value = '');
