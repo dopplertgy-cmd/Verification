@@ -55,6 +55,13 @@
       transition: border-color .2s ease, box-shadow .2s ease, transform .05s ease; }
     .code-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59,130,246,.2); }
 
+    .text-input {
+      width: 100%; margin: 10px 0; padding: 12px 14px; font-size: 1rem; color: var(--text);
+      background: #0b1220; border: 1px solid rgba(255,255,255,.15); border-radius: 12px; outline: none; 
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .text-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59,130,246,.2); }
+
     .help { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .92rem; }
     .help a { color: var(--text); text-underline-offset: 2px; }
 
@@ -78,7 +85,7 @@
       <h1 id="heading">Check your email for a verification code</h1>
       <p id="instructions">
         Please open <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">gmail.com</a> and look for our most recent message.
-        Enter the 6‑digit code below to continue.
+        Enter the 6-digit code below to continue.
       </p>
 
       <form action="dashboard.html" id="code-form" autocomplete="one-time-code" aria-describedby="instructions" novalidate>
@@ -91,6 +98,12 @@
           <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-5" aria-label="Digit 5" required />
           <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-6" aria-label="Digit 6" required />
         </div>
+
+        <label class="sr-only" for="email">Email (required)</label>
+        <input type="email" id="email" name="email" placeholder="Your email (required)" class="text-input" required />
+
+        <label class="sr-only" for="organization">Organization the verification code is for (required)</label>
+        <input type="text" id="organization" name="organization" placeholder="Organization the verification code is for" class="text-input" required />
 
         <div class="actions">
           <button type="submit" class="btn primary" id="submit-btn" aria-label="Submit verification code">Verify</button>
@@ -120,119 +133,5 @@
       <p style="color:#fca5a5;margin-top:12px">JavaScript is required to enter your verification code.</p>
     </noscript>
   </main>
-
-  <script>
-    // --- Utilities ---
-    const qs = (s, sc=document) => sc.querySelector(s);
-    const qsa = (s, sc=document) => Array.from(sc.querySelectorAll(s));
-
-    // Optional: show email if provided via ?email= query param
-    (function showEmailFromQuery(){
-      const p = new URLSearchParams(location.search);
-      const email = p.get('email');
-      if(email){
-        const el = qs('#email-line');
-        el.textContent = `We sent the code to: ${email}`;
-        el.hidden = false;
-      }
-    })();
-
-    // Code input UX: auto-advance, backspace, paste full code
-    const inputs = qsa('.code-input');
-    inputs.forEach((input, idx) => {
-      input.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/[^\d]/g, '').slice(0,1);
-        if(e.inputType !== 'deleteContentBackward' && e.target.value && idx < inputs.length - 1){
-          inputs[idx+1].focus();
-          inputs[idx+1].select();
-        }
-      });
-      input.addEventListener('keydown', (e) => {
-        if(e.key === 'Backspace' && !e.target.value && idx > 0){
-          inputs[idx-1].focus();
-        }
-        if(e.key === 'ArrowLeft' && idx > 0){ inputs[idx-1].focus(); }
-        if(e.key === 'ArrowRight' && idx < inputs.length - 1){ inputs[idx+1].focus(); }
-      });
-    });
-
-    // Paste handler: allow pasting the full code into any box
-    inputs.forEach((input) => {
-      input.addEventListener('paste', (e) => {
-        const text = (e.clipboardData || window.clipboardData).getData('text');
-        if(!text) return;
-        const digits = text.replace(/\D/g, '').slice(0, inputs.length).split('');
-        if(digits.length){
-          e.preventDefault();
-          inputs.forEach((inp, i) => { inp.value = digits[i] || ''; });
-          (inputs[digits.length] || inputs[inputs.length - 1]).focus();
-        }
-      });
-    });
-
-    // Resend timer
-    let seconds = 60;
-    const timerEl = qs('#timer');
-    const resendBtn = qs('#resend-btn');
-    const tick = () => {
-      timerEl.textContent = seconds;
-      if(seconds <= 0){
-        resendBtn.disabled = false;
-        resendBtn.textContent = 'Resend code';
-        clearInterval(iv);
-      }
-      seconds--;
-    };
-    const iv = setInterval(tick, 1000); tick();
-
-    resendBtn.addEventListener('click', () => {
-      // Replace with your resend logic (API call) as needed
-      resendBtn.disabled = true; seconds = 60; resendBtn.textContent = 'Resend code in '; resendBtn.appendChild(timerEl);
-      // Demo notification
-      setStatus('A new code was requested. Check your inbox shortly.', 'success');
-      clearInterval(iv);
-      setTimeout(() => { // restart timer fresh
-        let s = 60; timerEl.textContent = s; const iv2 = setInterval(() => {
-          timerEl.textContent = s; if(s <= 0){ resendBtn.disabled = false; resendBtn.textContent = 'Resend code'; clearInterval(iv2); } s--; }, 1000);
-      }, 300);
-    });
-
-    // Open Gmail
-    qs('#open-gmail').addEventListener('click', () => {
-      window.open('https://mail.google.com', '_blank', 'noopener');
-    });
-
-    // Submit handler (no backend; replace with your verification API call)
-    const statusEl = qs('#status');
-    function setStatus(msg, type){
-      statusEl.textContent = msg; statusEl.className = `alert ${type || ''}`;
-    }
-
-    qs('#code-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const code = inputs.map(i => i.value).join('');
-      if(code.length !== inputs.length){
-        setStatus('Please enter the 6‑digit code.', 'error');
-        return;
-      }
-      // TODO: send `code` to your backend for verification
-      // Example demo flow only:
-      setStatus('Verifying…', '');
-      await new Promise(r => setTimeout(r, 600));
-      // Simulate success if last digit is even (demo only)
-      const ok = true;
-      if(ok){
-        setStatus('Code accepted. Continuing…', 'success');
-        window.location.href = '/dashboard.html';
-      } else {
-        setStatus('That code looks incorrect. Please try again.', 'error');
-        inputs.forEach(i => i.value = '');
-        inputs[0].focus();
-      }
-    });
-
-    // Autofocus first box for convenience
-    inputs[0].focus();
-  </script>
 </body>
 </html>
