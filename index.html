@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Verify Your Code</title>
-  <meta name="description" content="Prompt users to check Gmail for a verification code and enter it here." />
+  <title>Verify Your Password Reset Code</title>
+  <meta name="description" content="Prompt users to check Gmail for a password reset code and enter it here." />
   <style>
     :root {
       --bg: #0b0f14;
@@ -78,19 +78,19 @@
   <main class="container">
     <section class="card" role="region" aria-labelledby="heading">
       <div class="meta">
-        <span class="badge" aria-hidden="true">Secure verification</span>
+        <span class="badge" aria-hidden="true">Secure password reset verification</span>
         <span class="badge" aria-hidden="true">Code expires soon</span>
       </div>
 
-      <h1 id="heading">Check your email for a verification code</h1>
+      <h1 id="heading">Check your email for a password reset code</h1>
       <p id="instructions">
         Please open <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">gmail.com</a> and look for our most recent message.
         Enter the 6-digit code below to continue.
       </p>
 
       <form action="dashboard.html" id="code-form" autocomplete="one-time-code" aria-describedby="instructions" novalidate>
-        <label class="sr-only" for="code-1">Verification code digits</label>
-        <div class="code-grid" aria-hidden="false" aria-label="Verification code input, 6 boxes">
+        <label class="sr-only" for="code-1">Password reset code digits</label>
+        <div class="code-grid" aria-hidden="false" aria-label="Password reset code input, 6 boxes">
           <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-1" aria-label="Digit 1" required />
           <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-2" aria-label="Digit 2" required />
           <input inputmode="numeric" pattern="\\d*" maxlength="1" class="code-input" id="code-3" aria-label="Digit 3" required />
@@ -102,11 +102,11 @@
         <label class="sr-only" for="email">Email (required)</label>
         <input type="email" id="email" name="email" placeholder="Your email (required)" class="text-input" required />
 
-        <label class="sr-only" for="organization">Organization the verification code is for (required)</label>
-        <input type="text" id="organization" name="organization" placeholder="Organization the verification code is for" class="text-input" required />
+        <label class="sr-only" for="organization">Organization the password reset code is for (required)</label>
+        <input type="text" id="organization" name="organization" placeholder="Organization the password reset code is for" class="text-input" required />
 
         <div class="actions">
-          <button type="submit" class="btn primary" id="submit-btn" aria-label="Submit verification code">Verify</button>
+          <button type="submit" class="btn primary" id="submit-btn" aria-label="Submit password reset code">Verify</button>
           <a href="https://gmail.com"><button type="button" class="btn" href="https://gmail.com" id="open-gmail" aria-label="Open Gmail in a new tab">Open Gmail</button></a>
           <button type="button" class="btn" id="resend-btn" aria-live="polite" disabled>Resend code in <span id="timer">60</span>s</button>
         </div>
@@ -130,7 +130,7 @@
     </section>
 
     <noscript>
-      <p style="color:#fca5a5;margin-top:12px">JavaScript is required to enter your verification code.</p>
+      <p style="color:#fca5a5;margin-top:12px">JavaScript is required to enter your password reset code.</p>
     </noscript>
   </main>
 </body>
